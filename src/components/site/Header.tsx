@@ -7,7 +7,7 @@ import { useSiteData } from "@/lib/site-data-context";
 const links = [
   { hash: "home", label: "Home" },
   { hash: "about", label: "About" },
-  { hash: "maeum", label: "Kbeautyretail" },
+  { hash: "maeum", label: "Maeum" },
   { hash: "markets", label: "Markets" },
   { hash: "operations", label: "Operations" },
   { hash: "growth", label: "Growth" },

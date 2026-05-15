@@ -113,7 +113,7 @@ function About() {
   ];
   return (
     <section id="about" className="relative py-28 lg:py-36">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-16 items-start">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-16 items-start lg:items-stretch">
         <div className="lg:col-span-7">
           <SectionHeader
             eyebrow="About K Beauty Retail"
@@ -140,10 +140,10 @@ function About() {
             ))}
           </div>
         </div>
-        <div className="lg:col-span-5 lg:sticky lg:top-28">
-          <Reveal>
+        <div className="lg:col-span-5 flex flex-col lg:min-h-0">
+          <Reveal className="flex h-full min-h-0 flex-1 flex-col">
             <div
-              className="relative rounded-[2rem] overflow-hidden grain"
+              className="relative flex-1 min-h-[280px] sm:min-h-[360px] lg:min-h-0 rounded-[2rem] overflow-hidden grain"
               style={{ boxShadow: "var(--shadow-card)" }}
             >
               <img
@@ -152,7 +152,7 @@ function About() {
                 alt="Kbeautyretail skincare collection"
                 width={1200}
                 height={1400}
-                className="w-full h-[560px] object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
           </Reveal>
@@ -211,14 +211,14 @@ function Brand() {
         </div>
         <div className="lg:col-span-6 order-1 lg:order-2">
           <SectionHeader
-            eyebrow="Introducing Kbeautyretail"
+            eyebrow="Introducing Maeum"
             title={
               <>
                 A premium Korean skincare brand,
                 <span className="italic text-primary font-normal"> globally minded.</span>
               </>
             }
-            intro="Kbeautyretail is designed in the spirit of modern Korean beauty culture and engineered for international shelves. Clean, considered, and unmistakably premium."
+            intro="MAEUM® is a premium Korean skincare brand owned by K Beauty Retail FZE. Built around modern beauty rituals, high-quality formulations, and emotional brand connection, MAEUM is positioned for international skincare consumers seeking accessible premium K-beauty."
           />
           <div className="mt-10 space-y-3">
             {pillars.map((p, i) => (

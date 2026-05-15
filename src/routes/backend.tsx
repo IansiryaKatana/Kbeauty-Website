@@ -2,7 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { LogIn, LogOut, RefreshCw, Save } from "lucide-react";
+import { Eye, EyeOff, LogIn, LogOut, RefreshCw, Save } from "lucide-react";
 import logo from "@/assets/logo.png";
 import type { AdminSettingsBundle, SettingKey } from "@/lib/cms-types";
 import { AdminUsersPanel } from "@/components/admin/AdminUsersPanel";
@@ -89,6 +89,7 @@ function Backend() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loginErr, setLoginErr] = useState("");
 
   const [tab, setTab] = useState<TabId>("submissions");
@@ -109,11 +110,10 @@ function Backend() {
     const res = await loginFn({ data: { email, password } });
     if (!res.ok) {
       const map: Record<string, string> = {
-        INVALID_CREDENTIALS: "Invalid email or password. Use your Supabase Authentication user.",
-        AUTH_NOT_CONFIGURED:
-          "Add SUPABASE_URL and SUPABASE_ANON_KEY (or VITE_SUPABASE_*) to your .env file.",
+        INVALID_CREDENTIALS: "Incorrect email or password. Please try again.",
+        AUTH_NOT_CONFIGURED: "Sign-in is temporarily unavailable. Please try again later.",
       };
-      setLoginErr(map[res.error] ?? "Sign in failed.");
+      setLoginErr(map[res.error] ?? "Unable to sign in. Please try again.");
       return;
     }
     toast.success("Signed in");
@@ -173,15 +173,25 @@ function Backend() {
               autoComplete="username"
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:border-primary"
             />
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              required
-              placeholder="Password"
-              autoComplete="current-password"
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:border-primary"
-            />
+            <div className="relative">
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="Password"
+                autoComplete="current-password"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 pr-11 text-sm focus:outline-none focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {loginErr ? <p className="text-xs text-destructive">{loginErr}</p> : null}
             <button
               type="submit"
@@ -190,10 +200,6 @@ function Backend() {
               <LogIn className="w-4 h-4" /> Sign In
             </button>
           </form>
-          <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
-            Sign in with the same email and password as your user in{" "}
-            <strong className="font-medium text-foreground/80">Supabase → Authentication</strong>.
-          </p>
         </div>
       </div>
     );
@@ -753,27 +759,10 @@ function SmtpPanel({
 
   return (
     <div className="space-y-6 max-w-xl">
-      <div>
-        <h2 className="text-lg font-medium">Zoho SMTP</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Contact form emails send through your Zoho mailbox. Put the app-specific password in{" "}
-          <code className="text-xs">ZOHO_SMTP_PASSWORD</code> in <code className="text-xs">.env</code>{" "}
-          (not your normal webmail password).
-        </p>
-      </div>
+      <h2 className="text-lg font-medium">Zoho SMTP</h2>
 
       {emailStatus ? (
         <ul className="text-sm space-y-1 rounded-xl border border-border bg-background p-4">
-          <li>
-            Active provider:{" "}
-            <span className="font-medium text-primary">
-              {emailStatus.primary === "zoho"
-                ? "Zoho SMTP"
-                : emailStatus.primary === "resend"
-                  ? "Resend (fallback)"
-                  : "Not configured"}
-            </span>
-          </li>
           <li>
             Zoho app password in .env:{" "}
             <span className={emailStatus.zohoPasswordSet ? "text-primary" : "text-destructive"}>
