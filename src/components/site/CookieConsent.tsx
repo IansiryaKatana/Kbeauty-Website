@@ -29,6 +29,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const COOKIE_SHEET_CLASS =
+  "mb-0 max-h-[90vh] rounded-t-3xl rounded-b-none border-0 bg-neutral-950 text-white pb-[max(1.5rem,env(safe-area-inset-bottom))] [&>div:first-child]:hidden";
+
 const CATEGORIES: {
   key: keyof Omit<CookiePreferences, "essential">;
   title: string;
@@ -50,6 +53,24 @@ const CATEGORIES: {
     description: "Allows us to measure campaigns and show more relevant content.",
   },
 ];
+
+function CookieConsentClose({
+  className,
+  ...props
+}: React.ComponentProps<typeof DrawerClose>) {
+  return (
+    <DrawerClose
+      className={cn(
+        "absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-neutral-800 text-white transition-colors hover:bg-neutral-700",
+        className,
+      )}
+      {...props}
+    >
+      <X className="h-4 w-4 shrink-0" aria-hidden />
+      <span className="sr-only">Close</span>
+    </DrawerClose>
+  );
+}
 
 function CookieConsentSwitch({
   className,
@@ -74,19 +95,24 @@ function CookieConsentSwitch({
 
 function ConsentButton({
   variant,
+  compact = false,
   className,
   children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant: "outline" | "solid" | "reject";
+  variant: "outline" | "permissions" | "solid" | "reject";
+  compact?: boolean;
 }) {
   return (
     <button
       type="button"
       className={cn(
-        "cookie-consent-btn w-full rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+        "cookie-consent-btn w-full rounded-xl font-medium transition-colors",
+        compact ? "px-2 py-2.5 text-[11px] leading-tight whitespace-nowrap" : "px-4 py-3 text-sm",
         variant === "outline" &&
           "cookie-consent-btn--outline bg-transparent text-white hover:bg-white/10",
+        variant === "permissions" &&
+          "cookie-consent-btn--permissions border-white/15 bg-neutral-800 text-white hover:bg-neutral-700",
         variant === "solid" &&
           "cookie-consent-btn--solid bg-white text-neutral-950 hover:bg-white/90",
         variant === "reject" &&
@@ -100,14 +126,68 @@ function ConsentButton({
   );
 }
 
+function CookieBannerBody({
+  compact = false,
+  onCustomize,
+  onRejectAll,
+  onAcceptAll,
+}: {
+  compact?: boolean;
+  onCustomize: () => void;
+  onRejectAll: () => void;
+  onAcceptAll: () => void;
+}) {
+  return (
+    <>
+      <h2
+        id="cookie-settings-title"
+        className={cn(
+          "cookie-consent-serif font-bold tracking-tight text-white",
+          compact ? "pr-10 text-xl" : "text-2xl sm:text-[1.65rem]",
+        )}
+      >
+        Cookie settings
+      </h2>
+      <p
+        id="cookie-settings-description"
+        className={cn("mt-3 text-sm leading-relaxed text-white/85", !compact && "mt-4")}
+      >
+        We use cookies to deliver and improve our services, analyze site usage, and if you agree,
+        to customize or personalize your experience and market our services to you. You can read
+        our{" "}
+        <Link to="/cookies" className="underline underline-offset-2 hover:text-white">
+          Cookie Policy
+        </Link>{" "}
+        here.
+      </p>
+
+      <div className={cn("space-y-3", compact ? "mt-5" : "mt-6")}>
+        <ConsentButton variant="permissions" compact={compact} onClick={onCustomize}>
+          Customize cookie settings
+        </ConsentButton>
+        <div className={cn("grid grid-cols-2", compact ? "gap-2" : "gap-3")}>
+          <ConsentButton variant="reject" compact={compact} onClick={onRejectAll}>
+            Reject all cookies
+          </ConsentButton>
+          <ConsentButton variant="solid" compact={compact} onClick={onAcceptAll}>
+            Accept all cookies
+          </ConsentButton>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function CustomizeBody({
   draft,
   onDraftChange,
   onSave,
+  compact = false,
 }: {
   draft: CookiePreferences;
   onDraftChange: (next: CookiePreferences) => void;
   onSave: () => void;
+  compact?: boolean;
 }) {
   return (
     <div className="space-y-5">
@@ -141,14 +221,14 @@ function CustomizeBody({
         </div>
       ))}
 
-      <ConsentButton variant="solid" onClick={onSave}>
+      <ConsentButton variant="solid" compact={compact} onClick={onSave}>
         Save preferences
       </ConsentButton>
     </div>
   );
 }
 
-function CookieBanner({
+function CookieBannerDesktop({
   onCustomize,
   onRejectAll,
   onAcceptAll,
@@ -164,39 +244,47 @@ function CookieBanner({
       aria-describedby="cookie-settings-description"
       className="cookie-consent-panel pointer-events-auto w-full max-w-md rounded-3xl bg-neutral-950 p-6 text-white shadow-[0_24px_80px_-12px_rgba(0,0,0,0.55)] sm:p-7"
     >
-      <h2
-        id="cookie-settings-title"
-        className="cookie-consent-serif text-2xl font-bold tracking-tight text-white sm:text-[1.65rem]"
-      >
-        Cookie settings
-      </h2>
-      <p
-        id="cookie-settings-description"
-        className="mt-4 text-sm leading-relaxed text-white/85"
-      >
-        We use cookies to deliver and improve our services, analyze site usage, and if you agree,
-        to customize or personalize your experience and market our services to you. You can read
-        our{" "}
-        <Link to="/cookies" className="underline underline-offset-2 hover:text-white">
-          Cookie Policy
-        </Link>{" "}
-        here.
-      </p>
-
-      <div className="mt-6 space-y-3">
-        <ConsentButton variant="outline" onClick={onCustomize}>
-          Customize cookie settings
-        </ConsentButton>
-        <div className="grid grid-cols-2 gap-3">
-          <ConsentButton variant="reject" onClick={onRejectAll}>
-            Reject all cookies
-          </ConsentButton>
-          <ConsentButton variant="solid" onClick={onAcceptAll}>
-            Accept all cookies
-          </ConsentButton>
-        </div>
-      </div>
+      <CookieBannerBody
+        onCustomize={onCustomize}
+        onRejectAll={onRejectAll}
+        onAcceptAll={onAcceptAll}
+      />
     </div>
+  );
+}
+
+function CookieBannerMobileSheet({
+  open,
+  onClose,
+  onCustomize,
+  onRejectAll,
+  onAcceptAll,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCustomize: () => void;
+  onRejectAll: () => void;
+  onAcceptAll: () => void;
+}) {
+  return (
+    <Drawer open={open} dismissible={false} onOpenChange={(next) => !next && onClose()}>
+      <DrawerContent className={cn(COOKIE_SHEET_CLASS, "px-5 pt-4")}>
+        <div
+          role="dialog"
+          aria-labelledby="cookie-settings-title"
+          aria-describedby="cookie-settings-description"
+          className="overflow-y-auto"
+        >
+          <CookieBannerBody
+            compact
+            onCustomize={onCustomize}
+            onRejectAll={onRejectAll}
+            onAcceptAll={onAcceptAll}
+          />
+        </div>
+        <CookieConsentClose onClick={onClose} />
+      </DrawerContent>
+    </Drawer>
   );
 }
 
@@ -220,16 +308,13 @@ function CustomizeShell({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="mb-0 max-h-[90vh] rounded-t-3xl border-0 bg-neutral-950 px-5 pb-6 pt-2 text-white">
-          <DrawerHeader className="px-0 text-left">
+        <DrawerContent className={cn(COOKIE_SHEET_CLASS, "px-5 pt-4")}>
+          <DrawerHeader className="px-0 pr-10 text-left">
             <DrawerTitle className="cookie-consent-serif text-xl text-white">{title}</DrawerTitle>
             <DrawerDescription className="text-white/70">{description}</DrawerDescription>
           </DrawerHeader>
-          <CustomizeBody draft={draft} onDraftChange={onDraftChange} onSave={onSave} />
-          <DrawerClose className="absolute right-4 top-4 rounded-full p-2 text-white/80 hover:bg-white/10 hover:text-white">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DrawerClose>
+          <CustomizeBody draft={draft} onDraftChange={onDraftChange} onSave={onSave} compact />
+          <CookieConsentClose />
         </DrawerContent>
       </Drawer>
     );
@@ -237,7 +322,7 @@ function CustomizeShell({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl border-0 bg-neutral-950 p-6 text-white sm:p-7 [&>button]:absolute [&>button]:right-4 [&>button]:top-4 [&>button]:rounded-full [&>button]:p-2 [&>button]:text-white/80 [&>button]:opacity-100 [&>button]:hover:bg-white/10 [&>button]:hover:text-white">
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl border-0 bg-neutral-950 p-6 text-white sm:p-7 [&>button]:absolute [&>button]:right-4 [&>button]:top-4 [&>button]:flex [&>button]:h-9 [&>button]:w-9 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:bg-neutral-800 [&>button]:p-0 [&>button]:text-white [&>button]:opacity-100 [&>button]:hover:bg-neutral-700 [&>button]:hover:text-white">
         <DialogHeader className="pr-8 text-left">
           <DialogTitle className="cookie-consent-serif text-xl text-white">{title}</DialogTitle>
           <DialogDescription className="text-white/70">{description}</DialogDescription>
@@ -249,6 +334,7 @@ function CustomizeShell({
 }
 
 export function CookieConsent() {
+  const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
@@ -258,6 +344,11 @@ export function CookieConsent() {
     writeCookieConsent(preferences);
     setVisible(false);
     setCustomizeOpen(false);
+  }, []);
+
+  const openCustomize = useCallback(() => {
+    setDraft(readCookieConsent()?.preferences ?? DEFAULT_PREFERENCES);
+    setCustomizeOpen(true);
   }, []);
 
   useEffect(() => {
@@ -297,18 +388,24 @@ export function CookieConsent() {
 
   return (
     <>
-      {visible && (
-        <div className="pointer-events-none fixed bottom-0 right-0 z-[60] p-4 sm:p-6">
-          <CookieBanner
-            onCustomize={() => {
-              setDraft(readCookieConsent()?.preferences ?? DEFAULT_PREFERENCES);
-              setCustomizeOpen(true);
-            }}
+      {visible &&
+        (isMobile ? (
+          <CookieBannerMobileSheet
+            open={visible && !customizeOpen}
+            onClose={() => applyPreferences(DEFAULT_PREFERENCES)}
+            onCustomize={openCustomize}
             onRejectAll={() => applyPreferences(DEFAULT_PREFERENCES)}
             onAcceptAll={() => applyPreferences(ACCEPT_ALL_PREFERENCES)}
           />
-        </div>
-      )}
+        ) : (
+          <div className="pointer-events-none fixed bottom-0 right-0 z-[60] p-4 sm:p-6">
+            <CookieBannerDesktop
+              onCustomize={openCustomize}
+              onRejectAll={() => applyPreferences(DEFAULT_PREFERENCES)}
+              onAcceptAll={() => applyPreferences(ACCEPT_ALL_PREFERENCES)}
+            />
+          </div>
+        ))}
 
       <CustomizeShell
         open={customizeOpen}

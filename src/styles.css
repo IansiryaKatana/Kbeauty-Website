@@ -217,6 +217,11 @@
     background-color: transparent !important;
   }
 
+  .cookie-consent-btn--permissions {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    background-color: rgb(38 38 38) !important;
+  }
+
   .cookie-consent-btn--solid {
     border-color: #fff !important;
     background-color: #fff !important;
