@@ -10,7 +10,7 @@ function analyticsAllowed() {
 
 export function GoogleAnalytics() {
   const pagePath = useRouterState({
-    select: (s) => `${s.location.pathname}${s.location.search}`,
+    select: (s) => `${s.location.pathname}${s.location.searchStr}`,
   });
   const pagePathRef = useRef(pagePath);
   pagePathRef.current = pagePath;
