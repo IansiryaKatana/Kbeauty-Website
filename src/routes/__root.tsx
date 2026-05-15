@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { CookieConsent } from "@/components/site/CookieConsent";
+import { GoogleAnalytics } from "@/components/site/GoogleAnalytics";
 
 function NotFoundComponent() {
   return (
@@ -129,6 +130,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <GoogleAnalytics />
       <CookieConsent />
       <Toaster richColors closeButton position="top-center" />
     </QueryClientProvider>
