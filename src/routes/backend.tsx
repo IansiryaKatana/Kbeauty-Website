@@ -758,11 +758,11 @@ function SmtpPanel({
   const [testing, setTesting] = useState(false);
 
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className="w-full space-y-6">
       <h2 className="text-lg font-medium">Zoho SMTP</h2>
 
       {emailStatus ? (
-        <ul className="text-sm space-y-1 rounded-xl border border-border bg-background p-4">
+        <ul className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 rounded-xl border border-border bg-background p-4">
           <li>
             Zoho app password in .env:{" "}
             <span className={emailStatus.zohoPasswordSet ? "text-primary" : "text-destructive"}>
@@ -789,7 +789,7 @@ function SmtpPanel({
               {emailStatus.resendReady ? "Available" : "Optional — not set"}
             </span>
           </li>
-          <li>
+          <li className="sm:col-span-2">
             Notification inboxes: {emailStatus.recipientCount}
             {emailStatus.recipients.length > 0 ? (
               <span className="text-muted-foreground"> ({emailStatus.recipients.join(", ")})</span>
@@ -798,59 +798,63 @@ function SmtpPanel({
         </ul>
       ) : null}
 
-      <Field label="SMTP host" value={draft.host ?? ""} onChange={(v) => onChange({ ...draft, host: v })} />
-      <Field
-        label="Port"
-        value={draft.port != null ? String(draft.port) : ""}
-        onChange={(v) => onChange({ ...draft, port: v ? Number(v) : undefined })}
-      />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={!!draft.secure}
-          onChange={(e) => onChange({ ...draft, secure: e.target.checked })}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+        <Field label="SMTP host" value={draft.host ?? ""} onChange={(v) => onChange({ ...draft, host: v })} />
+        <Field
+          label="Port"
+          value={draft.port != null ? String(draft.port) : ""}
+          onChange={(v) => onChange({ ...draft, port: v ? Number(v) : undefined })}
         />
-        SSL / TLS (use for port 465)
-      </label>
-      <Field
-        label="SMTP user (full email, e.g. info@kbeautyretail.com)"
-        value={draft.user ?? ""}
-        onChange={(v) => onChange({ ...draft, user: v })}
-      />
-      <Field
-        label="From email (what recipients see)"
-        value={draft.fromEmail ?? ""}
-        onChange={(v) => onChange({ ...draft, fromEmail: v })}
-      />
-      <Field label="Reply-to" value={draft.replyTo ?? ""} onChange={(v) => onChange({ ...draft, replyTo: v })} />
-      <Field
-        label="Notification emails (comma-separated)"
-        value={draft.notificationEmails ?? ""}
-        onChange={(v) => onChange({ ...draft, notificationEmails: v })}
-      />
-
-      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-end">
-        <div className="flex-1">
-          <Field label="Send test email to (optional)" value={testTo} onChange={setTestTo} />
+        <label className="flex items-center gap-2 text-sm md:col-span-2">
+          <input
+            type="checkbox"
+            checked={!!draft.secure}
+            onChange={(e) => onChange({ ...draft, secure: e.target.checked })}
+          />
+          SSL / TLS (use for port 465)
+        </label>
+        <Field
+          label="SMTP user (full email, e.g. info@kbeautyretail.com)"
+          value={draft.user ?? ""}
+          onChange={(v) => onChange({ ...draft, user: v })}
+        />
+        <Field
+          label="From email (what recipients see)"
+          value={draft.fromEmail ?? ""}
+          onChange={(v) => onChange({ ...draft, fromEmail: v })}
+        />
+        <Field label="Reply-to" value={draft.replyTo ?? ""} onChange={(v) => onChange({ ...draft, replyTo: v })} />
+        <div className="md:col-span-2">
+          <Field
+            label="Notification emails (comma-separated)"
+            value={draft.notificationEmails ?? ""}
+            onChange={(v) => onChange({ ...draft, notificationEmails: v })}
+          />
         </div>
-        <button
-          type="button"
-          disabled={testing}
-          onClick={async () => {
-            setTesting(true);
-            try {
-              await onTestEmail(testTo.trim() || undefined);
-            } finally {
-              setTesting(false);
-            }
-          }}
-          className="rounded-full border border-border px-5 py-3 text-sm hover:border-primary/50 disabled:opacity-50 whitespace-nowrap"
-        >
-          {testing ? "Sending…" : "Send test"}
-        </button>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end md:col-span-2">
+          <div className="min-w-0 flex-1">
+            <Field label="Send test email to (optional)" value={testTo} onChange={setTestTo} />
+          </div>
+          <button
+            type="button"
+            disabled={testing}
+            onClick={async () => {
+              setTesting(true);
+              try {
+                await onTestEmail(testTo.trim() || undefined);
+              } finally {
+                setTesting(false);
+              }
+            }}
+            className="shrink-0 rounded-full border border-border px-5 py-3 text-sm hover:border-primary/50 disabled:opacity-50 whitespace-nowrap"
+          >
+            {testing ? "Sending…" : "Send test"}
+          </button>
+        </div>
       </div>
 
-      <details className="text-sm">
+      <details className="w-full text-sm">
         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
           Resend fallback (optional)
         </summary>
