@@ -12,5 +12,15 @@ export default defineConfig({
       "@": path.resolve(process.cwd(), "src"),
     },
   },
+  optimizeDeps: {
+    // Never pre-bundle react-start for the browser — it includes node:async_hooks.
+    exclude: ["@tanstack/react-start"],
+    include: [
+      "@tanstack/react-router",
+      "@tanstack/react-query",
+      "@tanstack/router-core",
+      "@tanstack/router-core/ssr/client",
+    ],
+  },
   plugins: [tanstackStart(), react(), tailwindcss(), netlify()],
 });
