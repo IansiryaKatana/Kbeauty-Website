@@ -12,6 +12,8 @@ import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { CookieConsent } from "@/components/site/CookieConsent";
 import { GoogleAnalytics } from "@/components/site/GoogleAnalytics";
+import { gaHeadScripts } from "@/lib/google-analytics";
+import { resolveSiteUrl } from "@/lib/site-url";
 
 function NotFoundComponent() {
   return (
@@ -98,10 +100,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:image", content: "/favicon.png" },
       { name: "twitter:image", content: "/favicon.png" },
+      { name: "robots", content: "index, follow" },
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "stylesheet", href: appCss },
+    ],
+    scripts: [
+      ...gaHeadScripts(),
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Kbeautyretail",
+          url: resolveSiteUrl("/"),
+          description:
+            "Kbeautyretail is a UAE premium Korean skincare company serving the UK and GCC beauty markets.",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,

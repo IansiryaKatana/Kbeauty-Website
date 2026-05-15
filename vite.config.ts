@@ -15,12 +15,22 @@ export default defineConfig({
   optimizeDeps: {
     // Never pre-bundle react-start for the browser — it includes node:async_hooks.
     exclude: ["@tanstack/react-start"],
+    // Pre-bundle deps that TanStack Start pulls in late (avoids 504 Outdated Optimize Dep).
+    holdUntilCrawlEnd: true,
     include: [
       "@tanstack/react-router",
       "@tanstack/react-query",
       "@tanstack/router-core",
       "@tanstack/router-core/ssr/client",
+      "seroval",
     ],
   },
-  plugins: [tanstackStart(), react(), tailwindcss(), netlify()],
+  plugins: [
+    tanstackStart({
+      sitemap: { enabled: false },
+    }),
+    react(),
+    tailwindcss(),
+    netlify(),
+  ],
 });

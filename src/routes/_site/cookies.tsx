@@ -1,17 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { openCookieSettings } from "@/components/site/CookieConsent";
+import { canonicalLink } from "@/lib/seo";
+import { resolveSiteUrl } from "@/lib/site-url";
+
+const title = "Cookie Policy | Kbeautyretail";
+const description =
+  "Learn how Kbeautyretail uses cookies and manage your cookie preferences.";
 
 export const Route = createFileRoute("/_site/cookies")({
   head: () => ({
     meta: [
-      { title: "Cookie Policy | Kbeautyretail" },
-      {
-        name: "description",
-        content:
-          "Learn how Kbeautyretail uses cookies and manage your cookie preferences.",
-      },
+      { title },
+      { name: "description", content: description },
+      { name: "robots", content: "index, follow" },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: resolveSiteUrl("/cookies") },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
     ],
+    links: [canonicalLink("/cookies")],
   }),
   component: CookiePolicyPage,
 });

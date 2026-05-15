@@ -35,6 +35,8 @@ import logisticsImg from "@/assets/logistics.jpg";
 import contactImg from "@/assets/contact.jpg";
 
 import { contactSubmitSchema, inquiryTypeSchema, type ContactSubmitInput } from "@/lib/cms-types";
+import { canonicalLink, organizationJsonLd } from "@/lib/seo";
+import { resolveSiteUrl } from "@/lib/site-url";
 import { useSiteData } from "@/lib/site-data-context";
 import { submitContact } from "@/server/kbeauty-rpc";
 
@@ -51,20 +53,32 @@ export const Route = createFileRoute("/_site/")({
     const keywords =
       seo?.keywords ??
       "Korean skincare UAE, K beauty distributor UAE, Korean beauty wholesale UAE, Premium Korean skincare, Korean skincare GCC, Kbeautyretail skincare, Kbeautyretail beauty";
-    const ogImage = seo?.ogImage?.trim() || "/favicon.png";
+    const ogImagePath = seo?.ogImage?.trim() || "/favicon.png";
+    const ogImage = ogImagePath.startsWith("http")
+      ? ogImagePath
+      : resolveSiteUrl(ogImagePath.startsWith("/") ? ogImagePath : `/${ogImagePath}`);
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
+        { property: "og:url", content: resolveSiteUrl("/") },
         { property: "og:image", content: ogImage },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: ogImage },
+      ],
+      links: [canonicalLink("/")],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(organizationJsonLd()),
+        },
       ],
     };
   },
