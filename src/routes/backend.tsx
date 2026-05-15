@@ -867,7 +867,7 @@ function SmtpPanel({
         </summary>
         <div className="mt-4 space-y-4 pt-2 border-t border-border">
           <p className="text-muted-foreground text-xs">
-            Used if Zoho SMTP fails or on Cloudflare Workers where SMTP is unavailable. Set{" "}
+            Used if Zoho SMTP fails. Set{" "}
             <code className="text-xs">RESEND_API_KEY</code> in <code className="text-xs">.env</code>.
           </p>
           <Field
